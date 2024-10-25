@@ -97,13 +97,13 @@ namespace lyqbing.DGLAB
 		}
 
 		/// <summary>
-		/// 获取波形列表 API (由于 新V2 文档错误，无法对其完成适配！此功能处于严重异常状态！！！)
+		/// 获取波形列表 API (由于 新V2 文档错误，无法对其完成适配！此功能仍旧处于 V1 API)
 		/// </summary>
 		public string PulseListApi
 		{
 			get
 			{
-				return CoyotreUrl + ClientID + "/pulse_list";
+				return CoyotreUrl + "api/game/" + ClientID + "/pulse_list";
 			}
 		}
 

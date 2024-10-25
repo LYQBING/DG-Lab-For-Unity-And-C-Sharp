@@ -1,7 +1,6 @@
 using UnityEngine;
 using lyqbing.DGLAB;
 using System.Collections.Generic;
-using Mono.Cecil.Cil;
 
 /*
  让你开发的 Unity游戏 连接到郊狼
@@ -26,7 +25,7 @@ public class Demo
 	//获取游戏相应数据
 	public async void GetGameResponse()
 	{
-		GameResponse data = await DGLAB.GetGameResponse();
+		GameResponse data = await DGLab.GetGameResponse();
 
 		// 打印数据太多了，随便写几个，其他懒得写了，自己看文档吧
 		// https://github.com/hyperzlib/DG-Lab-Coyote-Game-Hub/blob/main/docs/api.md
@@ -37,11 +36,18 @@ public class Demo
 
 
 
-	//获取 脉冲列表 -- 严重错误：官方原因 --
-	public void GetPulseList()
+	//获取 脉冲列表 
+	public async void GetPulseList()
 	{
-		//PulseListJson Data = await DGLAB.GetPulseList();
-		Debug.Log("等待官方修复");
+		List<PulseList> data = await DGLab.GetPulseList();
+
+		string log = "";
+        foreach (PulseList item in data)
+        {
+			log += "【 ID：" + item.id + " Name：" + item.name + "】";
+        }
+
+		Debug.Log(log);
 	}
 
 
@@ -49,7 +55,7 @@ public class Demo
 	//获取当前 脉冲ID 及 列表
 	public async void GetPulseID()
 	{
-		PulseId data = await DGLAB.GetPulseID();
+		PulseId data = await DGLab.GetPulseID();
 
 		string currentPulseId = data.currentPulseId;
 		string pulseIdList = data.currentPulseId;
@@ -68,28 +74,28 @@ public class Demo
 	//获取强度配置 回执 JSON列表
 	public async void GetStrengthConfig()
 	{
-		StrengthConfig data = await DGLAB.GetStrengthConfig();
+		StrengthConfig data = await DGLab.GetStrengthConfig();
 		Debug.Log(" 当前基础强度：" + data.strength + " 当前随机强度：" + data.randomStrength);
 	}
 
 
 
 	//一键开火
-	public void Fire() => DGLAB.Fire();
+	public void Fire() => DGLab.Fire();
 
 
 
 	//设置脉冲ID (2个方法)
 	public void SetPulseID()
 	{
-		DGLAB.SetPulseID("ID");
+		DGLab.SetPulseID("ID");
 
 		List<string> list = new()
 		{
 			"ID1",
 			"ID2"
 		};
-		DGLAB.SetPulseID(list);
+		DGLab.SetPulseID(list);
 	}
 
 
@@ -97,12 +103,12 @@ public class Demo
 	//强度设置
 	public void SetStrengthConfigAdd()
 	{
-		DGLAB.SetStrength.Add();
-		DGLAB.SetStrength.Sub();
-		DGLAB.SetStrength.Set();
+		DGLab.SetStrength.Add();
+		DGLab.SetStrength.Sub();
+		DGLab.SetStrength.Set();
 		
-		DGLAB.SetRandomStrength.Add();
-		DGLAB.SetRandomStrength.Sub();
-		DGLAB.SetRandomStrength.Set();
+		DGLab.SetRandomStrength.Add();
+		DGLab.SetRandomStrength.Sub();
+		DGLab.SetRandomStrength.Set();
 	}
 }
