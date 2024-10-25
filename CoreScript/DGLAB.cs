@@ -1,25 +1,23 @@
 namespace lyqbing.DGLAB
 {
+	using System.Collections.Generic;
 	using System.Threading.Tasks;
 	using UnityEngine;
 
 	public static class DGLAB
 	{
-		#region 一键开火
 		/// <summary>
-		/// 一键开火
+		/// 获取游戏响应数据
 		/// </summary>
-		public static async void Fire(int strength = 1, int time = 1000)
+		public static async Task<GameResponse> GetGameResponse()
 		{
-			string JsonPost = "strength=" + strength + "&time" + time;
-			JsonPost = await FTPManager.Post(CoyoteApi.Instance.FireApi, JsonPost);
+			string JsonPost = await FTPManager.Get(CoyoteApi.Instance.GameResponseApi);
 			DeLog(JsonPost);
+			return JsonUtility.FromJson<GameResponse>(JsonPost);
 		}
-		#endregion
 
-		#region 脉冲相关
 		/// <summary>
-		/// 获取脉冲列表
+		/// 获取脉冲列表 (严重异常状态)
 		/// </summary>
 		public static async Task<PulseListJson> GetPulseList()
 		{
@@ -28,40 +26,74 @@ namespace lyqbing.DGLAB
 			return JsonUtility.FromJson<PulseListJson>(JsonPost);
 		}
 
+		#region 一键开火
 		/// <summary>
-		/// 获取脉冲ID
+		/// 一键开火API
 		/// </summary>
+		/// <param name="strength">一键开火强度，最高40</param>
+		/// <param name="time">一键开火时间，单位：毫秒，默认为5000，最高30000（30秒）</param>
+		/// <param name="overrides">多次一键开火时，是否重置时间，true为重置时间，false为叠加时间，默认为false</param>
+		/// <param name="pulseId">一键开火的波形ID</param>
+		public static async void Fire(int strength = 20, int time = 5000, bool overrides = false, string pulseId = "d6f83af0")
+		{
+			string JsonPost = "strength=" + strength + "&time=" + time + "&override" + overrides + "&pulseId=" + pulseId;
+			JsonPost = await FTPManager.Post(CoyoteApi.Instance.FireApi, JsonPost);
+			DeLog(JsonPost);
+		}
+		#endregion
+
+		#region 获取游戏当前波形ID
+		/// <summary>
+		/// 获取游戏当前波形ID
+		/// 注意：与官方文档不同，文档中仅提示 pulseId (列表) 但还存在 currentPulseId (当前)；
+		/// 因此，若要获取当前波形ID：请获取 currentPulseId ；若 pulseId 为空，则仅为单一波形
+		/// </summary>
+		/// <returns></returns>
 		public static async Task<PulseId> GetPulseID()
 		{
 			string JsonPost = await FTPManager.Get(CoyoteApi.Instance.PulseIdApi);
 			DeLog(JsonPost);
 			return JsonUtility.FromJson<PulseId>(JsonPost);
 		}
+		#endregion
 
+		#region 设置游戏当前波形ID
 		/// <summary>
-		/// 获取强度配置
+		/// 设置游戏当前波形ID
 		/// </summary>
-		public static async Task<StrengthConfigJson> GetStrengthConfig()
+		/// <param name="pulseId">波形ID</param>
+		public static void SetPulseID(string pulseIds)
 		{
-			string JsonPost = await FTPManager.Get(CoyoteApi.Instance.StrengthConfigApi);
-			DeLog(JsonPost);
-			return JsonUtility.FromJson<StrengthConfigJson>(JsonPost);
+			string JsonPost = "pulseId=" + pulseIds;
+
+			PulseID(JsonPost);
 		}
 
 		/// <summary>
-		/// 设置脉冲ID
+		/// 设置游戏当前波形List
 		/// </summary>
-		public static async void SetPulseID(string pulseId)
+		/// <param name="pulseIds">波形List</param>
+		public static void SetPulseID(List<string> pulseIds)
 		{
-			string JsonPost = "pulseId=" + pulseId;
+			string JsonPost = "";
+			foreach (string id in pulseIds)
+			{
+				JsonPost += "pulseId[]=" + id + "&";
+			}
+
+			PulseID(JsonPost);
+		}
+
+		private static async void PulseID(string JsonPost)
+		{
 			JsonPost = await FTPManager.Post(CoyoteApi.Instance.PulseIdApi, JsonPost);
 			DeLog(JsonPost);
 		}
 		#endregion
 
-		#region 属性相关
+		#region 游戏强度配置相关
 		/// <summary>
-		/// 设置基本属性
+		/// 设置基本游戏强度配置
 		/// </summary>
 		public static class SetStrength
 		{
@@ -86,7 +118,7 @@ namespace lyqbing.DGLAB
 		}
 
 		/// <summary>
-		/// 设置随机属性
+		/// 设置随机游戏强度配置
 		/// </summary>
 		public static class SetRandomStrength
 		{
@@ -110,27 +142,16 @@ namespace lyqbing.DGLAB
 			}
 		}
 
-		#endregion
-
-		#region 随机间隔
 		/// <summary>
-		/// 设置随机间隔
+		/// 获取游戏强度信息
 		/// </summary>
-		public static class SetInterval
+		public static async Task<StrengthConfig> GetStrengthConfig()
 		{
-			public static async void Min(int Set)
-			{
-				string JsonPost = "minInterval.set" + Set;
-				JsonPost = await FTPManager.Post(CoyoteApi.Instance.StrengthConfigApi, JsonPost);
-				DeLog(JsonPost);
-			}
-			public static async void Max(int Set)
-			{
-				string JsonPost = "maxInterval.set" + Set;
-				JsonPost = await FTPManager.Post(CoyoteApi.Instance.StrengthConfigApi, JsonPost);
-				DeLog(JsonPost);
-			}
+			string JsonPost = await FTPManager.Get(CoyoteApi.Instance.StrengthConfigApi);
+			DeLog(JsonPost);
+			return JsonUtility.FromJson<StrengthConfigJson>(JsonPost).strengthConfig;
 		}
+
 		#endregion
 
 		private static void DeLog(string JsonPost)
