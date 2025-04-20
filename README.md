@@ -1,5 +1,5 @@
 # DG-Lab-for-Unity-And-C#
-让你的 Unity 游戏 或 基于 C# 的项目开发 连接到 DG-Lab，由 <a href="https://github.com/hyperzlib/DG-Lab-Coyote-Game-Hub">DG-Lab-Coyote-Game-Hub</a> 的 API 实现。
+让你的 Unity 游戏 或 基于 C# 的项目开发 连接到郊狼 DG-Lab，由 <a href="https://github.com/hyperzlib/DG-Lab-Coyote-Game-Hub">DG-Lab-Coyote-Game-Hub</a> 的 API 实现。
 
 
 
